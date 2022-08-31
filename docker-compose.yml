@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  app:
+    build: 
+      context: ./src
+    container_name: app
+    networks:
+      - my-app-network
+    depends_on:
+      - db
+    restart: always
+    environment:
+      - DATABASE_HOST=db 
+      - DATABASE_NAME=CodeEducation 
+      - DATABASE_USER=User
+      - DATABASE_PASS=User@123
+  
+  db:
+    image: mysql:5.7
+    networks:
+      - my-app-network
+    container_name: db
+    environment:
+      - MYSQL_ROOT_PASSWORD=root@123 
+      - MYSQL_DATABASE=CodeEducation 
+      - MYSQL_USER=User
+      - MYSQL_PASSWORD=User@123
+
+  proxy-reverse:
+    container_name: proxy-reverse
+    build:
+      context: ./nginx
+    depends_on:
+      - app
+    restart: always
+    ports:
+      - 8080:80
+    networks:
+      - my-app-network  
+
+networks:
+  my-app-network:
+    driver: bridge
+
+
+    
